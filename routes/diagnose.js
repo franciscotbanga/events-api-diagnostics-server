@@ -14,6 +14,9 @@ const router = express.Router();
 // about validators or severity — it just hands the body off and returns the result.
 const { diagnose } = require('../src/diagnose');
 
+// In-memory log of recent diagnose calls. Powers GET /logs.
+const { record } = require('../src/log');
+
 // POST / — handles requests to /diagnose (mount path is added in server.js).
 // Accepts any JSON body; the diagnose() function is responsible for figuring
 // out what kind of event it is and what's wrong with it.
@@ -24,6 +27,11 @@ router.post('/', (req, res) => {
 
   // Run the diagnostic engine. This is a pure function call — no awaits, no I/O.
   const result = diagnose(event);
+
+  // Record the call in the in-memory log so it shows up in GET /logs.
+  // We log every call (including malformed ones) — being able to see what
+  // garbage someone tried to send is half the point of a diagnostics tool.
+  record(event, result);
 
   // Send the result back as JSON. We deliberately return HTTP 200 even when
   // ok=false: the diagnostic *itself* succeeded, even though it found issues
