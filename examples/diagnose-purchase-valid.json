@@ -1,0 +1,8 @@
+{
+  "event_name": "Purchase",
+  "event_id": "order-abc-123",
+  "timestamp": 1714000000,
+  "value": 79.50,
+  "currency": "BRL",
+  "content_ids": ["sku-001", "sku-042"]
+}

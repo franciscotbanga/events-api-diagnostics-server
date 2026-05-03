@@ -1,0 +1,7 @@
+# Installed npm packages — regenerated from package.json via `npm install`,
+# so there's no need to commit them (and they're huge).
+node_modules/
+
+# Local environment variables (API keys, secrets, tokens).
+# Never commit this file — it should stay on your machine only.
+.env
