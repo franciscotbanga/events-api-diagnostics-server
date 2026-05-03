@@ -2,6 +2,10 @@
 // Express returns a factory function that we'll call below to create our app instance.
 const express = require('express');
 
+// `path` is a Node built-in — used here to resolve the absolute path to /public
+// regardless of where the server is started from.
+const path = require('path');
+
 // CORS middleware. Browsers block cross-origin requests by default —
 // without this, a JS app served from any other origin (a pixel playground,
 // a local React app, a hosted advertiser dashboard) couldn't POST to /diagnose.
@@ -12,6 +16,8 @@ const cors = require('cors');
 // focused on app setup and lets each endpoint grow independently.
 const diagnoseRoute = require('./routes/diagnose');
 const logsRoute = require('./routes/logs');
+const hashRoute = require('./routes/hash');
+const dedupRoute = require('./routes/dedup');
 
 // Create an Express application instance. `app` is the object we register
 // routes and middleware on, and that we eventually start listening for HTTP requests.
@@ -37,26 +43,32 @@ app.use(cors());
 // Express 5 ships with this built-in (no need for the separate body-parser package).
 app.use(express.json());
 
-// Register a route handler for HTTP GET requests to the root path "/".
-// The callback receives `req` (incoming request) and `res` (outgoing response).
-app.get('/', (req, res) => {
-  // Send a JSON response. Express sets Content-Type: application/json automatically.
-  // `endpoints` lists the routes this server exposes, so a developer hitting
-  // the root URL can discover what's available without reading the source.
+// Machine-readable status (handy for curl / health checks). Used to live at "/",
+// but "/" now serves the SPA tester so a browser visit shows the UI.
+app.get('/status', (req, res) => {
   res.json({
     service: 'events-api-diagnostics-server',
     status: 'ok',
-    endpoints: ['POST /diagnose', 'GET /logs'],
+    endpoints: [
+      'POST /diagnose',
+      'POST /hash',
+      'POST /dedup',
+      'GET /logs',
+      'GET /status',
+    ],
   });
 });
 
-// Mount the diagnose router at /diagnose. Any route defined inside
-// routes/diagnose.js with path "/" will respond at "/diagnose".
+// Mount the API routers. Each one lives in its own file under /routes.
 app.use('/diagnose', diagnoseRoute);
-
-// Mount the logs router at /logs. Returns the in-memory ring buffer of
-// recent /diagnose calls.
+app.use('/hash', hashRoute);
+app.use('/dedup', dedupRoute);
 app.use('/logs', logsRoute);
+
+// Serve the single-page tester from /public. This must come AFTER the API
+// routes so /diagnose etc. aren't shadowed by a hypothetical static file
+// of the same name. Hitting "/" in a browser gets index.html.
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Start the HTTP server and bind it to PORT.
 // The callback runs once the server is successfully listening.
