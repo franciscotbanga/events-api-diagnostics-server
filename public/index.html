@@ -264,55 +264,49 @@
     .n { color: #B45309; }   /* numbers */
     .b { color: #1A1A1A; font-weight: 600; } /* booleans/null */
 
-    /* Custom Portuguese-translation tooltip. Native `title` attributes are slow
-       (~1s delay) and don't show well on screen-share, so we render the tooltip
-       ourselves via a ::after pseudo-element on hover. The translation lives in
-       a `data-pt` attribute on the element. Instant on hover, visible everywhere. */
+    /* Elements with a Portuguese translation get a subtle dotted underline
+       so the user knows to hover. The actual tooltip is a single global element
+       positioned via JavaScript (see #global-tooltip below) — that way it can't
+       be clipped by parent overflow and never goes off-screen. */
     [data-pt] {
-      position: relative;
       text-decoration: underline dotted #B0AEA8;
       text-underline-offset: 3px;
       cursor: help;
     }
-    [data-pt]:hover::after {
-      content: attr(data-pt);
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 0;
-      background: #1A1A1A;
-      color: #FFFFFF;
-      padding: 6px 10px;
-      font-size: 11.5px;
-      font-weight: 400;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      line-height: 1.35;
-      max-width: 360px;
-      white-space: normal;
-      letter-spacing: 0;
-      text-transform: none;
-      text-decoration: none;
-      z-index: 9999;
-      pointer-events: none;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    nav.tabs button[data-pt] {
+      text-decoration: none; /* tabs don't get the underline — cursor change is the cue */
     }
-    /* Small "PT-BR" badge on the tooltip so the user knows what language they're seeing */
-    [data-pt]:hover::before {
-      content: "pt-BR";
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 0;
+    /* The single global tooltip element. position: fixed = relative to viewport,
+       so no parent's overflow:hidden can clip it. JS positions and shows it. */
+    #global-tooltip {
+      position: fixed;
+      display: none;
+      z-index: 99999;
+      max-width: 360px;
+      pointer-events: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    #global-tooltip .tt-badge {
+      display: inline-block;
       background: #0D7377;
       color: #FFFFFF;
       padding: 2px 5px;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      transform: translateY(-100%);
-      z-index: 9999;
-      pointer-events: none;
+      margin-bottom: 2px;
     }
-    nav.tabs button[data-pt] {
-      text-decoration: none; /* tabs don't get the underline — cursor + tooltip is enough */
+    #global-tooltip .tt-text {
+      display: block;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 400;
+      line-height: 1.4;
+      white-space: normal;
+      letter-spacing: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     }
 
     /* ---- Footer ---- */
@@ -376,7 +370,76 @@
     <span><a href="/demo" data-pt="Demo do checkout (Pixel + Events API)">Pixel demo</a> · <a href="/logs" target="_blank" data-pt="Ver /logs (buffer em memória)">View raw /logs</a> · <a href="/status" target="_blank">/status</a></span>
   </footer>
 
+  <!-- Single global tooltip element. JS positions it on hover. -->
+  <div id="global-tooltip" data-lang="pt-BR">
+    <span class="tt-badge">pt-BR</span>
+    <span class="tt-text"></span>
+  </div>
+
   <script>
+    // ==== GLOBAL TOOLTIP ============================================
+    // One tooltip element for the whole page. position: fixed in CSS, JS positions it
+    // relative to the hovered element. Smart edge detection so it never goes off-screen.
+    (function setupTooltip() {
+      const $tt = document.getElementById('global-tooltip');
+      const $text = $tt.querySelector('.tt-text');
+      const $badge = $tt.querySelector('.tt-badge');
+      const PADDING = 8;
+
+      function show(el) {
+        // Determine which language to show (data-pt = Portuguese, data-en = English).
+        const pt = el.getAttribute('data-pt');
+        const en = el.getAttribute('data-en');
+        if (pt) { $text.textContent = pt; $badge.textContent = 'pt-BR'; }
+        else if (en) { $text.textContent = en; $badge.textContent = 'EN'; }
+        else return;
+
+        $tt.style.display = 'block';
+        $tt.style.visibility = 'hidden'; // measure without flicker
+
+        const rect = el.getBoundingClientRect();
+        const ttRect = $tt.getBoundingClientRect();
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        // Default: position BELOW the element (more room downward in most layouts).
+        let top = rect.bottom + 6;
+        let left = rect.left;
+
+        // Flip ABOVE if the tooltip would go below the viewport.
+        if (top + ttRect.height > vh - PADDING) {
+          top = rect.top - ttRect.height - 6;
+        }
+        // Clamp horizontally so it never overflows the right edge.
+        if (left + ttRect.width > vw - PADDING) {
+          left = vw - ttRect.width - PADDING;
+        }
+        if (left < PADDING) left = PADDING;
+
+        $tt.style.top = top + 'px';
+        $tt.style.left = left + 'px';
+        $tt.style.visibility = 'visible';
+      }
+
+      function hide() {
+        $tt.style.display = 'none';
+      }
+
+      // Use mouseover (bubbles, unlike mouseenter) and check for the closest [data-pt]/[data-en].
+      // This means dynamically-added elements (tabs, samples) get the tooltip for free.
+      document.addEventListener('mouseover', (e) => {
+        const el = e.target.closest('[data-pt], [data-en]');
+        if (el) show(el);
+      });
+      document.addEventListener('mouseout', (e) => {
+        const el = e.target.closest('[data-pt], [data-en]');
+        if (el && !el.contains(e.relatedTarget)) hide();
+      });
+      // Hide on scroll/resize so it never sticks in the wrong place.
+      window.addEventListener('scroll', hide, true);
+      window.addEventListener('resize', hide);
+    })();
+
     // Server endpoints come from the same origin we were served from.
     // Keeping it relative means this works behind any reverse proxy.
 
@@ -460,6 +523,9 @@
       "Email only": "Só e-mail",
       "Phone only": "Só telefone",
       "Both": "Ambos",
+      "Lead with email + phone": "Lead com e-mail + telefone",
+      "Broken: missing event_id": "Quebrado: sem event_id",
+      "Broken: bad timestamp type": "Quebrado: timestamp em formato errado",
       "50-event sample (mixed failures)": "Amostra de 50 eventos (falhas variadas)",
       "Single Purchase (BRL)": "Compra única (BRL)",
       // severity labels
@@ -514,7 +580,9 @@
         description: "Maps the event to TikTok Events API v1.3 shape and (with creds) sends it.",
         samples: {
           "Single Purchase (BRL)": SAMPLE_PURCHASE_VALID,
-          "Lead with email + phone": SAMPLE_LEAD_VALID
+          "Lead with email + phone": SAMPLE_LEAD_VALID,
+          "Broken: missing event_id": SAMPLE_PURCHASE_NO_EVENT_ID,
+          "Broken: bad timestamp type": SAMPLE_LEAD_BAD_TIMESTAMP
         }
       },
       dedup: {

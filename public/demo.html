@@ -28,49 +28,42 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 13px; line-height: 1.4;
     }
-    /* Custom hover tooltip showing the English translation. Same pattern as
-       index.html — instant, visible on screen-share, no `title`-attribute lag. */
+    /* Hover gets a dotted underline. Tooltip is the global #global-tooltip element
+       positioned by JS — same pattern as index.html. */
     [data-en] {
-      position: relative;
       text-decoration: underline dotted #B0AEA8;
       text-underline-offset: 3px;
       cursor: help;
     }
-    [data-en]:hover::after {
-      content: attr(data-en);
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 0;
-      background: #1A1A1A;
-      color: #FFFFFF;
-      padding: 6px 10px;
-      font-size: 11.5px;
-      font-weight: 400;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      line-height: 1.35;
+    #global-tooltip {
+      position: fixed;
+      display: none;
+      z-index: 99999;
       max-width: 360px;
-      white-space: normal;
-      letter-spacing: 0;
-      text-transform: none;
-      text-decoration: none;
-      z-index: 9999;
       pointer-events: none;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    [data-en]:hover::before {
-      content: "EN";
-      position: absolute;
-      bottom: calc(100% + 6px);
-      left: 0;
+    #global-tooltip .tt-badge {
+      display: inline-block;
       background: #0D7377;
       color: #FFFFFF;
       padding: 2px 5px;
       font-size: 9px;
       font-weight: 700;
       letter-spacing: 0.05em;
-      transform: translateY(-100%);
-      z-index: 9999;
-      pointer-events: none;
+      margin-bottom: 2px;
+    }
+    #global-tooltip .tt-text {
+      display: block;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 400;
+      line-height: 1.4;
+      white-space: normal;
+      letter-spacing: 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
     }
     header {
       background: #1A1A1A; color: #E5E3DD;
@@ -299,7 +292,51 @@
     </section>
   </div>
 
+  <!-- Single global tooltip (positioned by JS below). -->
+  <div id="global-tooltip">
+    <span class="tt-badge">EN</span>
+    <span class="tt-text"></span>
+  </div>
+
   <script>
+    // ==== GLOBAL TOOLTIP (same pattern as index.html — see comments there) ====
+    (function setupTooltip() {
+      const $tt = document.getElementById('global-tooltip');
+      const $text = $tt.querySelector('.tt-text');
+      const $badge = $tt.querySelector('.tt-badge');
+      const PADDING = 8;
+      function show(el) {
+        const en = el.getAttribute('data-en');
+        const pt = el.getAttribute('data-pt');
+        if (en) { $text.textContent = en; $badge.textContent = 'EN'; }
+        else if (pt) { $text.textContent = pt; $badge.textContent = 'pt-BR'; }
+        else return;
+        $tt.style.display = 'block';
+        $tt.style.visibility = 'hidden';
+        const rect = el.getBoundingClientRect();
+        const ttRect = $tt.getBoundingClientRect();
+        let top = rect.bottom + 6;
+        let left = rect.left;
+        if (top + ttRect.height > window.innerHeight - PADDING) top = rect.top - ttRect.height - 6;
+        if (left + ttRect.width > window.innerWidth - PADDING) left = window.innerWidth - ttRect.width - PADDING;
+        if (left < PADDING) left = PADDING;
+        $tt.style.top = top + 'px';
+        $tt.style.left = left + 'px';
+        $tt.style.visibility = 'visible';
+      }
+      function hide() { $tt.style.display = 'none'; }
+      document.addEventListener('mouseover', (e) => {
+        const el = e.target.closest('[data-en], [data-pt]');
+        if (el) show(el);
+      });
+      document.addEventListener('mouseout', (e) => {
+        const el = e.target.closest('[data-en], [data-pt]');
+        if (el && !el.contains(e.relatedTarget)) hide();
+      });
+      window.addEventListener('scroll', hide, true);
+      window.addEventListener('resize', hide);
+    })();
+
     // ---- Catalog (Brazilian sample products) ----
     const PRODUCTS = [
       { sku: "sku-camiseta-azul-M", name: "Camiseta Azul M",  price: 79.90 },
