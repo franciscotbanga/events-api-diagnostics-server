@@ -28,10 +28,49 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       font-size: 13px; line-height: 1.4;
     }
+    /* Custom hover tooltip showing the English translation. Same pattern as
+       index.html — instant, visible on screen-share, no `title`-attribute lag. */
     [data-en] {
+      position: relative;
       text-decoration: underline dotted #B0AEA8;
       text-underline-offset: 3px;
       cursor: help;
+    }
+    [data-en]:hover::after {
+      content: attr(data-en);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 400;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.35;
+      max-width: 360px;
+      white-space: normal;
+      letter-spacing: 0;
+      text-transform: none;
+      text-decoration: none;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    [data-en]:hover::before {
+      content: "EN";
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: #0D7377;
+      color: #FFFFFF;
+      padding: 2px 5px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      transform: translateY(-100%);
+      z-index: 9999;
+      pointer-events: none;
     }
     header {
       background: #1A1A1A; color: #E5E3DD;
@@ -214,15 +253,15 @@
 <body>
   <header>
     <span class="name">Loja Exemplo · Demo Pixel + Events API</span>
-    <span class="tag"><a href="/" data-en title="Back to diagnostic tester">← voltar ao testador</a></span>
+    <span class="tag"><a href="/" data-en="Back to diagnostic tester">← voltar ao testador</a></span>
   </header>
 
   <div class="layout">
     <!-- LEFT: storefront -->
     <section class="panel">
-      <h2 data-en title="Fake checkout">Checkout fictício</h2>
+      <h2 data-en="Fake checkout">Checkout fictício</h2>
       <p style="margin: 0 0 14px 0; color: var(--text-muted);">
-        <span data-en title="Add items, fill in your data, finish the purchase. The page fires both a TikTok pixel-style event AND a server-side Events API call, with the SAME event_id, so dedup works.">
+        <span data-en="Add items, fill in your data, finish the purchase. The page fires both a TikTok pixel-style event AND a server-side Events API call, with the SAME event_id, so dedup works.">
           Adicione itens, preencha seus dados e finalize. A página dispara <strong>tanto um evento de Pixel TikTok</strong> quanto uma chamada <strong>server-side</strong> à Events API, com o <strong>mesmo event_id</strong>, para que a deduplicação funcione.
         </span>
       </p>
@@ -230,30 +269,30 @@
       <div class="products" id="products"></div>
 
       <div class="cart">
-        <div data-en title="Customer info">Dados do cliente:</div>
+        <div data-en="Customer info">Dados do cliente:</div>
         <div class="field">
-          <label data-en title="Email">E-mail</label>
+          <label data-en="Email">E-mail</label>
           <input id="email" value="carlos.silva@exemplo.com.br" />
         </div>
         <div class="field">
-          <label data-en title="Phone">Telefone</label>
+          <label data-en="Phone">Telefone</label>
           <input id="phone" value="+55 11 99876-5432" />
         </div>
         <div class="total" id="total">Total: BRL 0,00</div>
-        <button class="checkout" id="checkout" data-en title="Complete purchase">Finalizar compra</button>
+        <button class="checkout" id="checkout" data-en="Complete purchase">Finalizar compra</button>
       </div>
     </section>
 
     <!-- RIGHT: live event view -->
     <section class="panel">
-      <h2 data-en title="Pixel + server events fired">Eventos disparados (Pixel + Server)</h2>
+      <h2 data-en="Pixel + server events fired">Eventos disparados (Pixel + Server)</h2>
       <div class="legend">
-        <span><span class="dot pixel"></span><span data-en title="Browser-side pixel (ttq)">Pixel (browser)</span></span>
-        <span><span class="dot server"></span><span data-en title="Server-side via /forward">Server-side via /forward</span></span>
+        <span><span class="dot pixel"></span><span data-en="Browser-side pixel (ttq)">Pixel (browser)</span></span>
+        <span><span class="dot server"></span><span data-en="Server-side via /forward">Server-side via /forward</span></span>
       </div>
       <div id="dedupBanner"></div>
       <div id="events">
-        <div class="empty-events" data-en title="Click 'Finalizar compra' to fire both events">
+        <div class="empty-events" data-en="Click 'Finalizar compra' to fire both events">
           Clique em "Finalizar compra" para disparar os eventos.
         </div>
       </div>
@@ -280,7 +319,7 @@
           '<div class="sku">' + p.sku + '</div>' +
           '<div class="price">BRL ' + p.price.toFixed(2).replace('.', ',') + '</div>' +
           '<label><input type="checkbox" data-sku="' + p.sku + '" data-price="' + p.price + '" /> ' +
-          '<span data-en title="Add to cart">Adicionar ao carrinho</span></label>';
+          '<span data-en="Add to cart">Adicionar ao carrinho</span></label>';
         $p.appendChild(div);
       }
       $p.addEventListener("change", updateTotal);
@@ -405,7 +444,7 @@
                                "TikTok deduplicará corretamente.";
       const matchEn = "Yes — same event_id used on both sides (pixel + server). TikTok will deduplicate correctly.";
       $dedup.innerHTML =
-        '<div class="dedup-banner" data-en title="' + matchEn + '">' +
+        '<div class="dedup-banner" data-en="' + matchEn + '">' +
         '✓ Deduplicação OK · ' + matchPixelServer +
         '</div>';
     }

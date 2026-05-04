@@ -264,15 +264,55 @@
     .n { color: #B45309; }   /* numbers */
     .b { color: #1A1A1A; font-weight: 600; } /* booleans/null */
 
-    /* Elements with a Portuguese translation tooltip get a subtle dotted underline,
-       so a user knows they can hover for the pt-BR version. */
-    [title][data-pt] {
+    /* Custom Portuguese-translation tooltip. Native `title` attributes are slow
+       (~1s delay) and don't show well on screen-share, so we render the tooltip
+       ourselves via a ::after pseudo-element on hover. The translation lives in
+       a `data-pt` attribute on the element. Instant on hover, visible everywhere. */
+    [data-pt] {
+      position: relative;
       text-decoration: underline dotted #B0AEA8;
       text-underline-offset: 3px;
       cursor: help;
     }
-    nav.tabs button[title] {
-      text-decoration: none; /* tabs don't get the underline — the cursor change is enough */
+    [data-pt]:hover::after {
+      content: attr(data-pt);
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: #1A1A1A;
+      color: #FFFFFF;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 400;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.35;
+      max-width: 360px;
+      white-space: normal;
+      letter-spacing: 0;
+      text-transform: none;
+      text-decoration: none;
+      z-index: 9999;
+      pointer-events: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+    }
+    /* Small "PT-BR" badge on the tooltip so the user knows what language they're seeing */
+    [data-pt]:hover::before {
+      content: "pt-BR";
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 0;
+      background: #0D7377;
+      color: #FFFFFF;
+      padding: 2px 5px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      transform: translateY(-100%);
+      z-index: 9999;
+      pointer-events: none;
+    }
+    nav.tabs button[data-pt] {
+      text-decoration: none; /* tabs don't get the underline — cursor + tooltip is enough */
     }
 
     /* ---- Footer ---- */
@@ -296,8 +336,8 @@
 </head>
 <body>
   <header>
-    <span class="name" data-pt title="servidor de diagnóstico de events-api">events-api-diagnostics-server</span>
-    <span class="tag" data-pt title="v0.1 — servidor de diagnóstico local · passe o mouse sobre os textos para ver a tradução em pt-BR">v0.1 — local diagnostic server · hover for pt-BR</span>
+    <span class="name" data-pt="servidor de diagnóstico de events-api">events-api-diagnostics-server</span>
+    <span class="tag" data-pt="v0.1 — servidor de diagnóstico local · passe o mouse sobre qualquer texto sublinhado para ver a tradução">v0.1 — local diagnostic server · hover any underlined text for pt-BR</span>
   </header>
 
   <nav class="tabs" id="tabs"></nav>
@@ -311,29 +351,29 @@
   <main>
     <section class="col">
       <div class="col-header">
-        <span class="title" data-pt title="Payload da requisição">Request payload</span>
+        <span class="title" data-pt="Payload da requisição">Request payload</span>
         <div class="samples" id="samples"></div>
       </div>
       <textarea id="payload" spellcheck="false"></textarea>
       <div class="send-row">
-        <span class="hint" data-pt title="⌘+Enter para enviar">⌘+Enter to send</span>
-        <button class="send" id="sendBtn" title="Enviar payload">Send Payload</button>
+        <span class="hint" data-pt="⌘+Enter para enviar">⌘+Enter to send</span>
+        <button class="send" id="sendBtn" data-pt="Enviar payload">Send Payload</button>
       </div>
     </section>
 
     <section class="col">
       <div class="col-header">
-        <span class="title" data-pt title="Resultado do diagnóstico">Diagnostic Result</span>
+        <span class="title" data-pt="Resultado do diagnóstico">Diagnostic Result</span>
       </div>
       <div class="response-body" id="response">
-        <div class="empty" data-pt title="Envie um payload para ver o diagnóstico.">Send a payload to see diagnostic output.</div>
+        <div class="empty" data-pt="Envie um payload para ver o diagnóstico.">Send a payload to see diagnostic output.</div>
       </div>
     </section>
   </main>
 
   <footer>
-    <span data-pt title="Demonstração de suporte de implementação. Não é uma integração oficial com qualquer plataforma de anúncios.">Implementation-support demo. Not an official integration with any ad platform.</span>
-    <span><a href="/demo" data-pt title="Demo do checkout (Pixel + Events API)">Pixel demo</a> · <a href="/logs" target="_blank" data-pt title="Ver /logs (buffer em memória)">View raw /logs</a> · <a href="/status" target="_blank">/status</a></span>
+    <span data-pt="Demonstração de suporte de implementação. Não é uma integração oficial com qualquer plataforma de anúncios.">Implementation-support demo. Not an official integration with any ad platform.</span>
+    <span><a href="/demo" data-pt="Demo do checkout (Pixel + Events API)">Pixel demo</a> · <a href="/logs" target="_blank" data-pt="Ver /logs (buffer em memória)">View raw /logs</a> · <a href="/status" target="_blank">/status</a></span>
   </footer>
 
   <script>
@@ -536,13 +576,13 @@
     const $urlEndpoint = document.getElementById("urlEndpoint");
     const $urlDescription = document.getElementById("urlDescription");
 
-    // Render the tab strip. Each tab carries a Portuguese tooltip via title.
+    // Render the tab strip. Each tab carries a Portuguese tooltip via data-pt.
     function renderTabs() {
       $tabs.innerHTML = "";
       for (const [key, tab] of Object.entries(TABS)) {
         const b = document.createElement("button");
         b.textContent = tab.label;
-        b.title = t(tab.label);
+        b.setAttribute("data-pt", t(tab.label));
         b.className = key === activeTab ? "active" : "";
         b.addEventListener("click", () => switchTab(key));
         $tabs.appendChild(b);
@@ -555,13 +595,12 @@
       const lbl = document.createElement("span");
       lbl.className = "label";
       lbl.textContent = "Load sample:";
-      lbl.title = t("Load sample:");
-      lbl.setAttribute("data-pt", "");
+      lbl.setAttribute("data-pt", t("Load sample:"));
       $samples.appendChild(lbl);
       for (const [name, factory] of Object.entries(TABS[activeTab].samples)) {
         const b = document.createElement("button");
         b.textContent = name;
-        b.title = t(name);
+        b.setAttribute("data-pt", t(name));
         b.addEventListener("click", () => loadSample(factory));
         $samples.appendChild(b);
       }
@@ -573,10 +612,7 @@
       $urlMethod.textContent = tab.method;
       $urlEndpoint.textContent = tab.url;
       $urlDescription.textContent = tab.description;
-      $urlDescription.title = t(tab.description);
-      $urlDescription.setAttribute("data-pt", "");
-      $urlDescription.style.textDecoration = "underline dotted #B0AEA8";
-      $urlDescription.style.textUnderlineOffset = "3px";
+      $urlDescription.setAttribute("data-pt", t(tab.description));
     }
 
     // Apply a sample to the textarea.
@@ -593,7 +629,7 @@
       const firstFactory = Object.values(TABS[key].samples)[0];
       loadSample(firstFactory);
       // Clear response when switching tabs — old result is for a different endpoint.
-      $response.innerHTML = '<div class="empty" data-pt title="Envie um payload para ver o diagnóstico.">Send a payload to see diagnostic output.</div>';
+      $response.innerHTML = '<div class="empty" data-pt="Envie um payload para ver o diagnóstico.">Send a payload to see diagnostic output.</div>';
     }
 
     // Lightweight JSON syntax highlighter — just enough to break up the wall of text.
@@ -662,8 +698,7 @@
       banner.className = "severity-banner severity-" + sev;
       const left = document.createElement("span");
       left.textContent = severityLabel(sev);
-      left.title = t(severityLabel(sev));
-      left.setAttribute("data-pt", "");
+      left.setAttribute("data-pt", t(severityLabel(sev)));
       const right = document.createElement("span");
       right.className = "meta";
       const parts = [];
