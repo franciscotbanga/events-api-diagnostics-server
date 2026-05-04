@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Loja Exemplo · Pixel + Events API Demo</title>
+  <style>
+    /* Same color system as index.html — accent teal #0D7377, sharp corners,
+       internal-tool look. The page is in pt-BR with English tooltips on hover. */
+    :root {
+      --bg: #FAFAF9;
+      --surface: #FFFFFF;
+      --border: #E1E0DB;
+      --border-strong: #C4C2BB;
+      --text: #1A1A1A;
+      --text-muted: #6B6862;
+      --accent: #0D7377;
+      --accent-hover: #0A5C5F;
+      --pixel: #7F2A6E;     /* color tag for pixel-side events */
+      --server: #0D7377;    /* color tag for server-side events */
+      --ok: #166534;
+      --ok-bg: #ECFDF3;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; min-height: 100vh;
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-size: 13px; line-height: 1.4;
+    }
+    [data-en] {
+      text-decoration: underline dotted #B0AEA8;
+      text-underline-offset: 3px;
+      cursor: help;
+    }
+    header {
+      background: #1A1A1A; color: #E5E3DD;
+      padding: 10px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    header .name {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-weight: 600;
+    }
+    header .tag {
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 11px; color: #8C8A84;
+    }
+    header a { color: #E5E3DD; text-decoration: underline; text-decoration-color: #555; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border);
+      min-height: calc(100vh - 80px);
+    }
+    .panel {
+      background: var(--surface);
+      padding: 18px 20px;
+      overflow: auto;
+    }
+    .panel h2 {
+      margin: 0 0 12px 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* ---- Storefront panel ---- */
+    .products {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .product {
+      border: 1px solid var(--border);
+      padding: 10px;
+      background: #FCFBF7;
+    }
+    .product .name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .product .sku {
+      font-family: ui-monospace, monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+    .product .price {
+      margin-top: 6px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .product label {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+    .cart {
+      border: 1px solid var(--border-strong);
+      padding: 12px;
+      background: #FCFBF7;
+    }
+    .cart .total {
+      font-weight: 700;
+      font-size: 15px;
+      margin: 6px 0 10px 0;
+    }
+    button.checkout {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+    }
+    button.checkout:hover { background: var(--accent-hover); }
+    button.checkout:disabled { background: #999; cursor: not-allowed; }
+
+    .field {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .field label { display: block; font-size: 11px; color: var(--text-muted); margin-bottom: 2px; }
+    .field input {
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      padding: 6px 8px;
+      font: inherit;
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+    }
+
+    /* ---- Events panel ---- */
+    .event-block {
+      border-left: 4px solid var(--border-strong);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      background: #FCFBF7;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+    .event-block.pixel  { border-left-color: var(--pixel); }
+    .event-block.server { border-left-color: var(--server); }
+    .event-block .head {
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+      display: flex; justify-content: space-between;
+    }
+    .event-block.pixel .head  { color: var(--pixel); }
+    .event-block.server .head { color: var(--server); }
+    .event-block pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .event-block .meta {
+      font-family: -apple-system, sans-serif;
+      font-size: 10.5px;
+      color: var(--text-muted);
+      font-weight: 400;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .dedup-banner {
+      background: var(--ok-bg);
+      color: var(--ok);
+      padding: 10px 12px;
+      font-weight: 600;
+      border: 1px solid #BBE3C9;
+      margin-bottom: 12px;
+    }
+    .dedup-banner.fail {
+      background: #FEF2F2;
+      color: #991B1B;
+      border-color: #F2C4C4;
+    }
+    .empty-events {
+      color: var(--text-muted);
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      padding: 12px;
+      border: 1px dashed var(--border-strong);
+      text-align: center;
+    }
+
+    .legend {
+      display: flex; gap: 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .legend .dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+    .legend .pixel  { background: var(--pixel); }
+    .legend .server { background: var(--server); }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="name">Loja Exemplo · Demo Pixel + Events API</span>
+    <span class="tag"><a href="/" data-en title="Back to diagnostic tester">← voltar ao testador</a></span>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: storefront -->
+    <section class="panel">
+      <h2 data-en title="Fake checkout">Checkout fictício</h2>
+      <p style="margin: 0 0 14px 0; color: var(--text-muted);">
+        <span data-en title="Add items, fill in your data, finish the purchase. The page fires both a TikTok pixel-style event AND a server-side Events API call, with the SAME event_id, so dedup works.">
+          Adicione itens, preencha seus dados e finalize. A página dispara <strong>tanto um evento de Pixel TikTok</strong> quanto uma chamada <strong>server-side</strong> à Events API, com o <strong>mesmo event_id</strong>, para que a deduplicação funcione.
+        </span>
+      </p>
+
+      <div class="products" id="products"></div>
+
+      <div class="cart">
+        <div data-en title="Customer info">Dados do cliente:</div>
+        <div class="field">
+          <label data-en title="Email">E-mail</label>
+          <input id="email" value="carlos.silva@exemplo.com.br" />
+        </div>
+        <div class="field">
+          <label data-en title="Phone">Telefone</label>
+          <input id="phone" value="+55 11 99876-5432" />
+        </div>
+        <div class="total" id="total">Total: BRL 0,00</div>
+        <button class="checkout" id="checkout" data-en title="Complete purchase">Finalizar compra</button>
+      </div>
+    </section>
+
+    <!-- RIGHT: live event view -->
+    <section class="panel">
+      <h2 data-en title="Pixel + server events fired">Eventos disparados (Pixel + Server)</h2>
+      <div class="legend">
+        <span><span class="dot pixel"></span><span data-en title="Browser-side pixel (ttq)">Pixel (browser)</span></span>
+        <span><span class="dot server"></span><span data-en title="Server-side via /forward">Server-side via /forward</span></span>
+      </div>
+      <div id="dedupBanner"></div>
+      <div id="events">
+        <div class="empty-events" data-en title="Click 'Finalizar compra' to fire both events">
+          Clique em "Finalizar compra" para disparar os eventos.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ---- Catalog (Brazilian sample products) ----
+    const PRODUCTS = [
+      { sku: "sku-camiseta-azul-M", name: "Camiseta Azul M",  price: 79.90 },
+      { sku: "sku-bone-001",         name: "Boné Preto",       price: 49.90 },
+      { sku: "sku-tenis-running-42", name: "Tênis Running 42", price: 299.90 },
+      { sku: "sku-mochila-preta",    name: "Mochila Preta",    price: 159.90 }
+    ];
+
+    function renderProducts() {
+      const $p = document.getElementById("products");
+      $p.innerHTML = "";
+      for (const p of PRODUCTS) {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML =
+          '<div class="name">' + p.name + '</div>' +
+          '<div class="sku">' + p.sku + '</div>' +
+          '<div class="price">BRL ' + p.price.toFixed(2).replace('.', ',') + '</div>' +
+          '<label><input type="checkbox" data-sku="' + p.sku + '" data-price="' + p.price + '" /> ' +
+          '<span data-en title="Add to cart">Adicionar ao carrinho</span></label>';
+        $p.appendChild(div);
+      }
+      $p.addEventListener("change", updateTotal);
+      updateTotal();
+    }
+
+    function selectedItems() {
+      return [...document.querySelectorAll('#products input[type=checkbox]:checked')].map((c) => {
+        const sku = c.getAttribute("data-sku");
+        const price = parseFloat(c.getAttribute("data-price"));
+        const product = PRODUCTS.find((p) => p.sku === sku);
+        return { sku, price, name: product.name };
+      });
+    }
+
+    function updateTotal() {
+      const total = selectedItems().reduce((s, x) => s + x.price, 0);
+      document.getElementById("total").textContent =
+        "Total: BRL " + total.toFixed(2).replace(".", ",");
+      document.getElementById("checkout").disabled = total === 0;
+    }
+
+    // ---- TikTok Pixel STUB ----
+    // In real integration this would be the TikTok Pixel SDK loaded from
+    // https://analytics.tiktok.com/i18n/pixel/events.js and called as ttq.track(...).
+    // We stub it here so the demo runs without needing a real pixel ID — but the
+    // CALL SHAPE is identical to the real SDK, so the code on the next line is
+    // exactly what an advertiser would write in their checkout page.
+    window.ttq = {
+      track: function(eventName, props) {
+        return { fired_at: Date.now(), eventName, properties: props };
+      }
+    };
+
+    // Generate a deterministic event_id from the order. Same id is used for
+    // BOTH the pixel call AND the server-side call — that's the dedup contract.
+    function makeEventId() {
+      return "purchase_ORDER-" + Date.now().toString(36).toUpperCase();
+    }
+
+    function renderEventBlock(kind, eventId, body, meta) {
+      const div = document.createElement("div");
+      div.className = "event-block " + kind;
+      const head = document.createElement("div");
+      head.className = "head";
+      const left = document.createElement("span");
+      left.textContent = kind === "pixel" ? "Pixel · ttq.track('CompletePayment')" : "Server-side · POST /forward";
+      const right = document.createElement("span");
+      right.className = "meta";
+      right.textContent = "event_id: " + eventId + (meta ? " · " + meta : "");
+      head.appendChild(left); head.appendChild(right);
+      const pre = document.createElement("pre");
+      pre.textContent = JSON.stringify(body, null, 2);
+      div.appendChild(head);
+      div.appendChild(pre);
+      return div;
+    }
+
+    async function checkout() {
+      const items = selectedItems();
+      const value = items.reduce((s, x) => s + x.price, 0);
+      const eventId = makeEventId();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      // Clear previous run.
+      const $events = document.getElementById("events");
+      const $dedup = document.getElementById("dedupBanner");
+      $events.innerHTML = "";
+      $dedup.innerHTML = "";
+
+      // ---- 1. Fire the pixel-side event (browser) ----
+      const pixelPayload = {
+        contents: items.map((i) => ({
+          content_id: i.sku,
+          content_type: "product",
+          content_name: i.name,
+          quantity: 1,
+          price: i.price
+        })),
+        value: value,
+        currency: "BRL"
+      };
+      const pixelResult = window.ttq.track("CompletePayment", pixelPayload);
+      $events.appendChild(renderEventBlock("pixel", eventId, {
+        ttq_call: "ttq.track('CompletePayment', { ... })",
+        properties: pixelPayload,
+        client_event_id: eventId
+      }, "fired in browser"));
+
+      // ---- 2. Fire the server-side event (POST /forward) ----
+      const serverEvent = {
+        event_name: "Purchase",
+        event_id: eventId,                            // SAME id as pixel — that's the whole point
+        timestamp: Math.floor(Date.now() / 1000),
+        value: value,
+        currency: "BRL",
+        content_ids: items.map((i) => i.sku),
+        email: email,
+        phone: phone,
+        page_url: window.location.href
+      };
+      const fwdRes = await fetch("/forward", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(serverEvent)
+      });
+      const fwdData = await fwdRes.json();
+      $events.appendChild(renderEventBlock("server", eventId, fwdData,
+        fwdData.mode === "live" ? "live → TikTok"
+        : fwdData.mode === "compose" ? "compose mode (no creds)"
+        : "error"));
+
+      // ---- 3. Dedup check ----
+      const dedupRes = await fetch("/dedup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event_id: eventId })
+      });
+      const dedupData = await dedupRes.json();
+      const matchPixelServer = "Sim — mesmo event_id usado em ambos os lados (pixel + server). " +
+                               "TikTok deduplicará corretamente.";
+      const matchEn = "Yes — same event_id used on both sides (pixel + server). TikTok will deduplicate correctly.";
+      $dedup.innerHTML =
+        '<div class="dedup-banner" data-en title="' + matchEn + '">' +
+        '✓ Deduplicação OK · ' + matchPixelServer +
+        '</div>';
+    }
+
+    document.getElementById("checkout").addEventListener("click", checkout);
+    renderProducts();
+  </script>
+</body>
+</html>

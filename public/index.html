@@ -264,6 +264,17 @@
     .n { color: #B45309; }   /* numbers */
     .b { color: #1A1A1A; font-weight: 600; } /* booleans/null */
 
+    /* Elements with a Portuguese translation tooltip get a subtle dotted underline,
+       so a user knows they can hover for the pt-BR version. */
+    [title][data-pt] {
+      text-decoration: underline dotted #B0AEA8;
+      text-underline-offset: 3px;
+      cursor: help;
+    }
+    nav.tabs button[title] {
+      text-decoration: none; /* tabs don't get the underline — the cursor change is enough */
+    }
+
     /* ---- Footer ---- */
     footer {
       padding: 8px 18px;
@@ -285,8 +296,8 @@
 </head>
 <body>
   <header>
-    <span class="name">events-api-diagnostics-server</span>
-    <span class="tag">v0.1 — local diagnostic server</span>
+    <span class="name" data-pt title="servidor de diagnóstico de events-api">events-api-diagnostics-server</span>
+    <span class="tag" data-pt title="v0.1 — servidor de diagnóstico local · passe o mouse sobre os textos para ver a tradução em pt-BR">v0.1 — local diagnostic server · hover for pt-BR</span>
   </header>
 
   <nav class="tabs" id="tabs"></nav>
@@ -300,29 +311,29 @@
   <main>
     <section class="col">
       <div class="col-header">
-        <span class="title">Request payload</span>
+        <span class="title" data-pt title="Payload da requisição">Request payload</span>
         <div class="samples" id="samples"></div>
       </div>
       <textarea id="payload" spellcheck="false"></textarea>
       <div class="send-row">
-        <span class="hint">⌘+Enter to send</span>
-        <button class="send" id="sendBtn">Send Payload</button>
+        <span class="hint" data-pt title="⌘+Enter para enviar">⌘+Enter to send</span>
+        <button class="send" id="sendBtn" title="Enviar payload">Send Payload</button>
       </div>
     </section>
 
     <section class="col">
       <div class="col-header">
-        <span class="title">Diagnostic Result</span>
+        <span class="title" data-pt title="Resultado do diagnóstico">Diagnostic Result</span>
       </div>
       <div class="response-body" id="response">
-        <div class="empty">Send a payload to see diagnostic output.</div>
+        <div class="empty" data-pt title="Envie um payload para ver o diagnóstico.">Send a payload to see diagnostic output.</div>
       </div>
     </section>
   </main>
 
   <footer>
-    <span>Implementation-support demo. Not an official integration with any ad platform.</span>
-    <span><a href="/logs" target="_blank">View raw /logs</a> · <a href="/status" target="_blank">/status</a></span>
+    <span data-pt title="Demonstração de suporte de implementação. Não é uma integração oficial com qualquer plataforma de anúncios.">Implementation-support demo. Not an official integration with any ad platform.</span>
+    <span><a href="/demo" data-pt title="Demo do checkout (Pixel + Events API)">Pixel demo</a> · <a href="/logs" target="_blank" data-pt title="Ver /logs (buffer em memória)">View raw /logs</a> · <a href="/status" target="_blank">/status</a></span>
   </footer>
 
   <script>
@@ -371,6 +382,57 @@
       return e;
     };
 
+    // pt-BR translations for UI strings. Hovered everywhere to signal
+    // Brazil-market readiness without forcing the whole UI into Portuguese.
+    const PT = {
+      // tab labels
+      "Diagnose": "Diagnosticar",
+      "Dedup Check": "Verificar deduplicação",
+      "Audit Batch": "Auditar lote",
+      "Forward to TikTok": "Encaminhar para a TikTok Events API",
+      "Purchase Event": "Evento de Compra",
+      "Lead Event": "Evento de Lead",
+      "Hash Test": "Teste de hash",
+      // tab descriptions
+      "Auto-detects event type. Returns severity + fix.":
+        "Detecta o tipo de evento automaticamente. Retorna severidade + correção.",
+      "Has this event_id been seen in the recent buffer?":
+        "Esse event_id já foi visto no buffer recente?",
+      "Aggregates findings across many events. Use this for the 'why is my data wrong?' ticket.":
+        "Agrega resultados de muitos eventos. Use para o ticket 'por que meus dados estão errados?'",
+      "Maps the event to TikTok Events API v1.3 shape and (with creds) sends it.":
+        "Mapeia o evento para o formato TikTok Events API v1.3 e (com credenciais) envia.",
+      "Same engine — pre-loaded with Purchase shapes.":
+        "Mesmo motor — pré-carregado com formatos de Compra.",
+      "Same engine — pre-loaded with Lead shapes.":
+        "Mesmo motor — pré-carregado com formatos de Lead.",
+      "Normalize then SHA-256. Shows the input → normalized → hash chain.":
+        "Normaliza e aplica SHA-256. Mostra a cadeia entrada → normalizado → hash.",
+      // sample chip labels
+      "Valid Purchase": "Compra válida",
+      "Missing currency": "Sem currency",
+      "Missing event_id": "Sem event_id",
+      "Lead with bad timestamp": "Lead com timestamp inválido",
+      "Likely new id": "ID provavelmente novo",
+      "Reused id": "ID reutilizado",
+      "Valid": "Válido",
+      "Bad timestamp": "Timestamp inválido",
+      "Email only": "Só e-mail",
+      "Phone only": "Só telefone",
+      "Both": "Ambos",
+      "50-event sample (mixed failures)": "Amostra de 50 eventos (falhas variadas)",
+      "Single Purchase (BRL)": "Compra única (BRL)",
+      // severity labels
+      "OK": "OK",
+      "Degraded — will affect reporting": "Degradado — vai afetar o relatório",
+      "Critical — event will be rejected": "Crítico — evento será rejeitado",
+      "Request error": "Erro na requisição",
+      "Response": "Resposta",
+      // misc
+      "Load sample:": "Carregar exemplo:",
+    };
+    const t = (s) => PT[s] || s; // fallback to English if no translation
+
     // Tab definitions — single source of truth for what each tab does.
     const TABS = {
       diagnose: {
@@ -383,6 +445,36 @@
           "Missing currency": SAMPLE_PURCHASE_NO_CURRENCY,
           "Missing event_id": SAMPLE_PURCHASE_NO_EVENT_ID,
           "Lead with bad timestamp": SAMPLE_LEAD_BAD_TIMESTAMP
+        }
+      },
+      audit: {
+        label: "Audit Batch",
+        method: "POST",
+        url: "/audit",
+        description: "Aggregates findings across many events. Use this for the 'why is my data wrong?' ticket.",
+        samples: {
+          "50-event sample (mixed failures)": () => ({
+            events: [
+              SAMPLE_PURCHASE_VALID(),
+              SAMPLE_PURCHASE_NO_CURRENCY(),
+              SAMPLE_PURCHASE_NO_EVENT_ID(),
+              SAMPLE_LEAD_BAD_TIMESTAMP(),
+              SAMPLE_PURCHASE_VALID(),
+              SAMPLE_PURCHASE_NO_CURRENCY(),
+              SAMPLE_LEAD_VALID(),
+              SAMPLE_PURCHASE_VALID()
+            ]
+          })
+        }
+      },
+      forward: {
+        label: "Forward to TikTok",
+        method: "POST",
+        url: "/forward",
+        description: "Maps the event to TikTok Events API v1.3 shape and (with creds) sends it.",
+        samples: {
+          "Single Purchase (BRL)": SAMPLE_PURCHASE_VALID,
+          "Lead with email + phone": SAMPLE_LEAD_VALID
         }
       },
       dedup: {
@@ -444,39 +536,47 @@
     const $urlEndpoint = document.getElementById("urlEndpoint");
     const $urlDescription = document.getElementById("urlDescription");
 
-    // Render the tab strip.
+    // Render the tab strip. Each tab carries a Portuguese tooltip via title.
     function renderTabs() {
       $tabs.innerHTML = "";
       for (const [key, tab] of Object.entries(TABS)) {
         const b = document.createElement("button");
         b.textContent = tab.label;
+        b.title = t(tab.label);
         b.className = key === activeTab ? "active" : "";
         b.addEventListener("click", () => switchTab(key));
         $tabs.appendChild(b);
       }
     }
 
-    // Render the sample chips for the active tab.
+    // Render the sample chips for the active tab — Portuguese tooltips on each.
     function renderSamples() {
       $samples.innerHTML = "";
       const lbl = document.createElement("span");
       lbl.className = "label";
       lbl.textContent = "Load sample:";
+      lbl.title = t("Load sample:");
+      lbl.setAttribute("data-pt", "");
       $samples.appendChild(lbl);
       for (const [name, factory] of Object.entries(TABS[activeTab].samples)) {
         const b = document.createElement("button");
         b.textContent = name;
+        b.title = t(name);
         b.addEventListener("click", () => loadSample(factory));
         $samples.appendChild(b);
       }
     }
 
-    // Render the URL bar.
+    // Render the URL bar. Description gets a Portuguese tooltip.
     function renderUrlBar() {
       const tab = TABS[activeTab];
       $urlMethod.textContent = tab.method;
       $urlEndpoint.textContent = tab.url;
       $urlDescription.textContent = tab.description;
+      $urlDescription.title = t(tab.description);
+      $urlDescription.setAttribute("data-pt", "");
+      $urlDescription.style.textDecoration = "underline dotted #B0AEA8";
+      $urlDescription.style.textUnderlineOffset = "3px";
     }
 
     // Apply a sample to the textarea.
@@ -493,7 +593,7 @@
       const firstFactory = Object.values(TABS[key].samples)[0];
       loadSample(firstFactory);
       // Clear response when switching tabs — old result is for a different endpoint.
-      $response.innerHTML = '<div class="empty">Send a payload to see diagnostic output.</div>';
+      $response.innerHTML = '<div class="empty" data-pt title="Envie um payload para ver o diagnóstico.">Send a payload to see diagnostic output.</div>';
     }
 
     // Lightweight JSON syntax highlighter — just enough to break up the wall of text.
@@ -562,6 +662,8 @@
       banner.className = "severity-banner severity-" + sev;
       const left = document.createElement("span");
       left.textContent = severityLabel(sev);
+      left.title = t(severityLabel(sev));
+      left.setAttribute("data-pt", "");
       const right = document.createElement("span");
       right.className = "meta";
       const parts = [];

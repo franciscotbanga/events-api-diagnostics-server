@@ -1,3 +1,7 @@
+// Load .env into process.env. Must come BEFORE any module that reads env vars.
+// In production we'd use real secret management; .env is for local dev only.
+require('dotenv').config();
+
 // Import the Express framework. `require` is Node's built-in way to load a module.
 // Express returns a factory function that we'll call below to create our app instance.
 const express = require('express');
@@ -18,6 +22,8 @@ const diagnoseRoute = require('./routes/diagnose');
 const logsRoute = require('./routes/logs');
 const hashRoute = require('./routes/hash');
 const dedupRoute = require('./routes/dedup');
+const forwardRoute = require('./routes/forward');
+const auditRoute = require('./routes/audit');
 
 // Create an Express application instance. `app` is the object we register
 // routes and middleware on, and that we eventually start listening for HTTP requests.
@@ -53,9 +59,17 @@ app.get('/status', (req, res) => {
       'POST /diagnose',
       'POST /hash',
       'POST /dedup',
+      'POST /forward',
+      'POST /audit',
       'GET /logs',
       'GET /status',
     ],
+    tiktok_integration: {
+      live_mode: Boolean(
+        process.env.TIKTOK_ACCESS_TOKEN && process.env.TIKTOK_PIXEL_ID
+      ),
+      test_event_code_set: Boolean(process.env.TIKTOK_TEST_EVENT_CODE),
+    },
   });
 });
 
@@ -63,12 +77,15 @@ app.get('/status', (req, res) => {
 app.use('/diagnose', diagnoseRoute);
 app.use('/hash', hashRoute);
 app.use('/dedup', dedupRoute);
+app.use('/forward', forwardRoute);
+app.use('/audit', auditRoute);
 app.use('/logs', logsRoute);
 
-// Serve the single-page tester from /public. This must come AFTER the API
+// Serve the static frontends from /public. This must come AFTER the API
 // routes so /diagnose etc. aren't shadowed by a hypothetical static file
-// of the same name. Hitting "/" in a browser gets index.html.
-app.use(express.static(path.join(__dirname, 'public')));
+// of the same name. The `extensions: ['html']` option lets us hit URLs
+// like /demo (which resolves to public/demo.html) without the .html suffix.
+app.use(express.static(path.join(__dirname, 'public'), { extensions: ['html'] }));
 
 // Start the HTTP server and bind it to PORT.
 // The callback runs once the server is successfully listening.

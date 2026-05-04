@@ -1,0 +1,491 @@
+{
+  "events": [
+    {
+      "event_name": "Purchase",
+      "timestamp": "2026-05-03T18:00:00Z",
+      "value": 0,
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1001",
+      "timestamp": 1714500060,
+      "value": 277.5,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1002",
+      "timestamp": 1714500120,
+      "value": 327.29,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1003",
+      "timestamp": 1714500180,
+      "value": 51.64,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1004",
+      "timestamp": 1714500240,
+      "value": 140.06,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1005",
+      "timestamp": 1714500300,
+      "value": 318.12,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1006",
+      "timestamp": 1714500360,
+      "value": 151.02,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1007",
+      "timestamp": 1714500420,
+      "value": 153.21,
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1008",
+      "timestamp": 1714500480,
+      "value": 165.29,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1009",
+      "timestamp": 1714500540,
+      "value": 286.86,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1010",
+      "timestamp": 1714500600,
+      "value": 286.03,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "timestamp": 1714500660,
+      "value": 176.06,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1012",
+      "timestamp": 1714500720,
+      "value": 188.74,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1013",
+      "timestamp": 1714500780,
+      "value": 0,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1014",
+      "timestamp": 1714500840,
+      "value": 267.08,
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1015",
+      "timestamp": 1714500900,
+      "value": 307.57,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1016",
+      "timestamp": 1714500960,
+      "value": 165.05,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1017",
+      "timestamp": "2026-05-03T18:00:00Z",
+      "value": 262.37,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1018",
+      "timestamp": 1714501080,
+      "value": 173.9,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1019",
+      "timestamp": 1714501140,
+      "value": 69.9,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1020",
+      "timestamp": 1714501200,
+      "value": 258.37,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1021",
+      "timestamp": 1714501260,
+      "value": 341.02,
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "timestamp": 1714501320,
+      "value": 271.37,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1023",
+      "timestamp": 1714501380,
+      "value": 161.4,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1024",
+      "timestamp": 1714501440,
+      "value": 297.65,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1025",
+      "timestamp": 1714501500,
+      "value": 332.87,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1026",
+      "timestamp": 1714501560,
+      "value": 0,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1027",
+      "timestamp": 1714501620,
+      "value": 156.8,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1028",
+      "timestamp": 1714501680,
+      "value": 142.77,
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1029",
+      "timestamp": 1714501740,
+      "value": 158.17,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1030",
+      "timestamp": 1714501800,
+      "value": 269.79,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1031",
+      "timestamp": 1714501860,
+      "value": 207.12,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1032",
+      "timestamp": 1714501920,
+      "value": 198.32,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "timestamp": 1714501980,
+      "value": 262.86,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1034",
+      "timestamp": "2026-05-03T18:00:00Z",
+      "value": 179.55,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1035",
+      "timestamp": 1714502100,
+      "value": 67.12,
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1036",
+      "timestamp": 1714502160,
+      "value": 168.32,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1037",
+      "timestamp": 1714502220,
+      "value": 85.81,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1038",
+      "timestamp": 1714502280,
+      "value": 239.26,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1039",
+      "timestamp": 1714502340,
+      "value": 0,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1040",
+      "timestamp": 1714502400,
+      "value": 219.3,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1041",
+      "timestamp": 1714502460,
+      "value": 195.04,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1042",
+      "timestamp": 1714502520,
+      "value": 288.82,
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1043",
+      "timestamp": 1714502580,
+      "value": 184.95,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "timestamp": 1714502640,
+      "value": 139.48,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1045",
+      "timestamp": 1714502700,
+      "value": 347.87,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-camiseta-azul-M"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1046",
+      "timestamp": 1714502760,
+      "value": 324.73,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-bone-001"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1047",
+      "timestamp": 1714502820,
+      "value": 167.17,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-tenis-running-42"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1048",
+      "timestamp": 1714502880,
+      "value": 189.19,
+      "currency": "BRL",
+      "content_ids": [
+        "sku-mochila-preta"
+      ]
+    },
+    {
+      "event_name": "Purchase",
+      "event_id": "purchase_ORDER-1049",
+      "timestamp": 1714502940,
+      "value": 99.81,
+      "content_ids": [
+        "sku-relogio-007"
+      ]
+    }
+  ]
+}

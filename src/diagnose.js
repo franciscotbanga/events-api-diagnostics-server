@@ -249,4 +249,26 @@ function diagnose(event) {
   };
 }
 
-module.exports = { diagnose };
+// Helper used by src/audit.js to look up per-issue copy when aggregating
+// findings across many events. Without this, audit reports would have to
+// re-derive the copy from concatenated diagnose() strings.
+function getInfoForIssueLabel(label, eventType = 'Purchase') {
+  if (label.startsWith('missing ')) {
+    const field = label.slice('missing '.length);
+    return (
+      MISSING_FIELD_INFO[eventType]?.[field] ??
+      MISSING_FIELD_INFO.GENERIC[field] ??
+      null
+    );
+  }
+  if (label.startsWith('invalid ')) {
+    const field = label.slice('invalid '.length);
+    // Find the ISSUE_INFO entry whose key starts with this field name.
+    for (const [issueStr, info] of Object.entries(ISSUE_INFO)) {
+      if (issueStr.startsWith(field + ' ')) return info;
+    }
+  }
+  return null;
+}
+
+module.exports = { diagnose, getInfoForIssueLabel };
